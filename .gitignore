@@ -132,3 +132,4 @@ config.yml.gpg
 memo_to_contact_map.txt
 myob_contacts.json
 history/
+.idea/
