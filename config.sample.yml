@@ -1,0 +1,8 @@
+myob_username: _your_myob_user_name_
+myob_password: _your_myob_password_
+myob_client_id: _your_myob_essentials_api_client_id_ (get it from the developer dashboard https://my.myob.com.au/Bd/pages/DevAppList.aspx)
+myob_client_secret: _your_myob_essentials_api_secret_ (get it from the developer dashboard https://my.myob.com.au/Bd/pages/DevAppList.aspx)
+myob_ga_secret: _your_myob_google_authenticator_secret_ (2fa secret)
+myob_business_uid: _your_myob_business_uid_ (check in the URL when you log into myob essentials in the browser)
+token_file: _file_to_store_oauth_token_
+redirect_url: _oauth_redirect_url_ (get it from the developer dashboard https://my.myob.com.au/Bd/pages/DevAppList.aspx)
