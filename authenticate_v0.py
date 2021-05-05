@@ -32,6 +32,7 @@ def authenticate():
     driver.get(login_url)
     element = driver.find_element_by_id("UserName")
     element.send_keys(config['myob_username'])
+    driver.find_element_by_xpath('//button[text()="Next "]').click()
     element = driver.find_element_by_id("Password")
     element.send_keys(config['myob_password'])
     driver.find_element_by_xpath('//button[text()="Sign in"]').click()
