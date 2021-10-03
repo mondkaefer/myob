@@ -34,6 +34,7 @@ def _do_post(url: str, body: dict, dryrun: bool):
     else:
         try:
             r = requests.post(url, headers=_create_headers(), json=body)
+            print(r.text)
             r.raise_for_status()
             return r
         except requests.exceptions.HTTPError:
@@ -41,7 +42,6 @@ def _do_post(url: str, body: dict, dryrun: bool):
 
 
 def get_contacts():
-
     url = f'{api_base_url}/businesses/{config["myob_business_uid"]}/contacts'
     return json.loads(_do_get(url).content)['items']
 
@@ -58,6 +58,7 @@ def get_items():
 
 def get_item_by_name(name: str):
     items = get_items()
+    print(items)
     for i in items:
         if i['name'] == name:
             return i
@@ -98,3 +99,4 @@ def create_invoice(json_template_file: str, parameter_dict: dict, dryrun: bool):
     url = f'{api_base_url}/businesses/{config["myob_business_uid"]}/sale/invoices'
     invoice_str = template.text_from_template_file(json_template_file, parameter_dict)
     return _do_post(url, json.loads(invoice_str), dryrun=dryrun)
+

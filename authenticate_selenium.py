@@ -9,8 +9,6 @@ from datetime import datetime, timedelta
 from dateutil import parser
 import urllib.parse as urlparse
 from urllib.parse import parse_qs
-from selenium import webdriver
-import chromedriver_binary
 
 
 def datetime_converter(o):
@@ -18,9 +16,8 @@ def datetime_converter(o):
         return o.__str__()
 
 
-def authenticate():
+def authenticate(driver):
     config = SecureConfig().decrypt(util.secure_config_file)
-    driver = webdriver.Chrome()
 
     # log in to myob using 2-factor authentication
     encoded_redirect_url = urlparse.quote(config['redirect_url'])
@@ -49,7 +46,6 @@ def authenticate():
 
     parsed = urlparse.urlparse(driver.current_url)
     code = parse_qs(parsed.query)['code'][0]
-    driver.close()
 
     # get access token
     url = 'https://secure.myob.com/oauth2/v1/authorize/'
@@ -70,17 +66,21 @@ def authenticate():
                 'expires_at': datetime.now() + timedelta(seconds=(int(auth_tokens['expires_in']) - 60))}
         print(f"{json.dumps(data, default=datetime_converter)}", file=f)
 
+    return driver
 
-def get_access_token():
+
+def get_access_token(driver):
     config = SecureConfig().decrypt(util.secure_config_file)
     if os.path.isfile(config['token_file']):
         with open(config['token_file'], "r") as f:
             data = json.load(f)
             if datetime.now() > parser.parse(data['expires_at']):
-                authenticate()
-                return get_access_token()
+                authenticate(driver)
+                return get_access_token(driver)
             else:
                 return data['access_token']
     else:
-        authenticate()
-        return get_access_token()
+        authenticate(driver)
+        url = 'https://essentials.myob.co.nz/LA.CO.NZ/app.htm#businesses/179995/invoices/new'
+        driver.get(url)
+        return get_access_token(driver)

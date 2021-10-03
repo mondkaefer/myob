@@ -1,8 +1,10 @@
 import os
+import functools
 from typing import Dict, List
 from enum import Enum, auto, unique
 
 secure_config_file = 'config.yml.gpg'
+
 
 @unique
 class PaymentType(Enum):
@@ -11,7 +13,8 @@ class PaymentType(Enum):
     DHARMA_GEAR_NON_MEMBER = auto(),
     OTHER = auto()
 
-ITEM_NAMES: Dict[PaymentType,str] = {
+
+ITEM_NAMES: Dict[PaymentType, str] = {
     PaymentType.DANA: "Dana",
     PaymentType.DHARMA_GEAR_MEMBER: "Dharmagear sales: members",
     PaymentType.DHARMA_GEAR_NON_MEMBER: "Dharmagear sales: non-members"
@@ -59,8 +62,8 @@ def read_bank_feed_csv(path_to_file: str, memo_blacklist: list):
             d = {}
             for j in range(0, len(cols)):
                 d[col_names[j]] = cols[j]
-            col_of_interest = 'OP code'
-            #col_of_interest = 'Dana'
+            # col_of_interest = 'OP code'
+            col_of_interest = 'Dana'
             assert col_of_interest in d
             if d[col_of_interest] == ITEM_NAMES[PaymentType.DANA]:
                 d['payment_type'] = PaymentType.DANA
@@ -112,3 +115,16 @@ def read_cash_payments_csv(path_to_file: str):
     assert len(lines) == (1 + len(payments)), f'line count in {path_to_file} does not match up'
 
     return col_names, payments
+
+
+def wait_for_enter_before_execution(func):
+    """
+    Decorator to wait for keyboard input before proceeding
+    """
+
+    @functools.wraps(func)
+    def wrapper_wait_for_enter(*args, **kwargs):
+        input('Hit ENTER to continue...')
+        return func(*args, **kwargs)
+
+    return wrapper_wait_for_enter

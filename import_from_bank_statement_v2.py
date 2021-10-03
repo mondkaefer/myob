@@ -1,12 +1,12 @@
 import os
 import sys
 import util
-import myob_v0
+import myob_v2
 import json
 from optparse import OptionParser
 
 memo_blacklist: list = []
-invoice_template_file = './templates/dana_invoice_post.tpl'
+invoice_template_file = './templates/dana_invoice_post_v2.tpl'
 contact_map_file = './memo_to_contact_map.txt'
 contacts_file = './myob_contacts.json'
 
@@ -42,7 +42,7 @@ if os.path.isfile(contacts_file):
         contacts = json.load(json_file)
 else:
     print(f'downloading contacts from myob')
-    contacts = myob_v0.get_contacts()
+    contacts = myob_v2.get_contacts()
     print(f'storing myob contacts in file {contacts_file}')
     with open(contacts_file, 'w') as json_file:
         json.dump(contacts, json_file)
@@ -80,7 +80,7 @@ if options.verify_only:
     sys.exit(0)
 
 print('getting item "Dana" from myob')
-dana_item = myob_v0.get_item_by_name('Dana')
+dana_item = myob_v2.get_item_by_name('Dana')
 
 # create an invoice for each record and save it in audit log
 with open(audit_file, 'w') as f:
@@ -93,7 +93,7 @@ with open(audit_file, 'w') as f:
             (day, month, year) = dp['Date'].split('/')
             date = f'{year}-{month}-{day}'
         date_with_time = f'{date}T00:00:00'
-        invoice_number = myob_v0.get_next_invoice_number()
+        invoice_number = myob_v2.get_next_invoice_number()
         param_dict = {
             '__INVOICE_NUMBER__': invoice_number,
             '__DATE__': date_with_time,
@@ -106,7 +106,7 @@ with open(audit_file, 'w') as f:
             '__TAX_TYPE_UID__': f'{dana_item["saleTaxType"]["uid"]}'
         }
         print(f'creating invoice for {contact_map[dp["Memo/Description"]]} (${dp["Amount"]}, {date}, {invoice_number})')
-        myob_v0.create_invoice(invoice_template_file, param_dict, dryrun=options.dryrun)
+        myob_v2.create_invoice(invoice_template_file, param_dict, dryrun=options.dryrun)
         audit_record = f'{dp["Memo/Description"]},{contact_map[dp["Memo/Description"]]},' \
                        f'{dp["Amount"]},{date},{invoice_number}{os.linesep}'
         f.write(audit_record)
