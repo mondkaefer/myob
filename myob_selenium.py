@@ -10,7 +10,6 @@ from selenium.common.exceptions import NoSuchElementException
 
 config = SecureConfig().decrypt(util.secure_config_file)
 
-
 def log_in(driver):
     driver.get('https://essentials.myob.co.nz/')
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "UserName")))
@@ -26,21 +25,24 @@ def log_in(driver):
     driver.find_element_by_xpath('//button[text()="Verify"]').click()
 
 
-@util.wait_for_enter_before_execution
+#@util.wait_for_enter_before_execution
+@util.wait_before_execution(wait_s=2)
 def go_to_invoices_page(driver):
     text = 'Sales'
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, f"//*[text()='{text}']")))
+    WebDriverWait(driver, 10, poll_frequency=1).until(EC.presence_of_element_located((By.XPATH, f"//*[text()='{text}']")))
     driver.find_element_by_xpath(f'//*[text()="{text}"]').click()
     text = 'Invoices'
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, f"//*[text()='{text}']")))
+    WebDriverWait(driver, 10, poll_frequency=1).until(EC.presence_of_element_located((By.XPATH, f"//*[text()='{text}']")))
     driver.find_element_by_xpath(f'//*[text()="{text}"]').click()
 
 
-@util.wait_for_enter_before_execution
 def create_new_invoice(driver, date, amount, contact_display_name):
     id = 'createButton'
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, id)))
-    driver.find_element_by_id(id).click()
+    WebDriverWait(driver, 10, poll_frequency=1).until(EC.presence_of_element_located((By.ID, id)))
+    element = driver.find_element_by_id(id)
+    while not (element.is_displayed() and element.is_enabled()):
+        time.sleep(1)
+    element.click()
     id = 'itemId'
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, id)))
     driver.find_element_by_id(id).send_keys('Dana\n')
@@ -61,9 +63,9 @@ def create_new_invoice(driver, date, amount, contact_display_name):
     driver.find_element_by_id(id).click()
     return invoice_number
 
-#### new stuff
 
-@util.wait_for_enter_before_execution
+#@util.wait_for_enter_before_execution
+@util.wait_before_execution(wait_s=1)
 def go_to_transactions_page(driver):
     text = 'Banking'
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, f"//*[text()='{text}']")))
@@ -73,7 +75,8 @@ def go_to_transactions_page(driver):
     driver.find_element_by_xpath(f'//*[text()="{text}"]').click()
 
 
-@util.wait_for_enter_before_execution
+#@util.wait_for_enter_before_execution
+@util.wait_before_execution(wait_s=1)
 def match_transaction(driver, date_string: str, bank_account: str, other_match_string: str,
                       invoice_number: str):
     id = 'processed'
@@ -96,13 +99,14 @@ def match_transaction(driver, date_string: str, bank_account: str, other_match_s
         match_string = other_match_string
         button = driver.find_element_by_xpath(f"//span[contains(text(), '{match_string}')]/following::button[@class='btn btn-default btn-xs actions-button']")
     button.click()
-    time.sleep(1)
+    time.sleep(0.5)
     try:
         checkbox = driver.find_element_by_xpath(f"//td[contains(text(), '{invoice_number}')]/preceding::input[@type='checkbox']")
         checkbox.click()
     except NoSuchElementException:
         print('Cannot match - please match manually')
 
+    id = 'saveButton'
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, id)))
     driver.find_element_by_id(id).click()
 

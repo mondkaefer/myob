@@ -1,4 +1,5 @@
 import os
+import time
 import functools
 from typing import Dict, List
 from enum import Enum, auto, unique
@@ -128,3 +129,18 @@ def wait_for_enter_before_execution(func):
         return func(*args, **kwargs)
 
     return wrapper_wait_for_enter
+
+
+def wait_before_execution(wait_s):
+    """
+    Decorator to wait for 2 seconds before proceeding
+    """
+
+    def decorator_wait_before_execution(func):
+        @functools.wraps(func)
+        def wrapper_wait_for_enter(*args, **kwargs):
+            time.sleep(wait_s)
+            return func(*args, **kwargs)
+
+        return wrapper_wait_for_enter
+    return decorator_wait_before_execution
