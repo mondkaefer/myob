@@ -104,7 +104,7 @@ def match_transaction(driver, date_string: str, bank_account: str, other_match_s
         checkbox = driver.find_element_by_xpath(f"//td[contains(text(), '{invoice_number}')]/preceding::input[@type='checkbox']")
         checkbox.click()
     except NoSuchElementException:
-        print('Cannot match - please match manually')
+        print('--> Cannot match - please match manually <--')
 
     id = 'saveButton'
     WebDriverWait(driver, 10, poll_frequency=1).until(EC.presence_of_element_located((By.ID, id)))
