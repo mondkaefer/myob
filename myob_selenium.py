@@ -26,25 +26,25 @@ def log_in(driver):
 
 
 #@util.wait_for_enter_before_execution
-@util.wait_before_execution(wait_s=2)
+@util.wait_before_execution(wait_s=4)
 def go_to_invoices_page(driver):
     text = 'Sales'
-    WebDriverWait(driver, 10, poll_frequency=1).until(EC.presence_of_element_located((By.XPATH, f"//*[text()='{text}']")))
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, f"//*[text()='{text}']")))
     driver.find_element_by_xpath(f'//*[text()="{text}"]').click()
     text = 'Invoices'
-    WebDriverWait(driver, 10, poll_frequency=1).until(EC.presence_of_element_located((By.XPATH, f"//*[text()='{text}']")))
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, f"//*[text()='{text}']")))
     driver.find_element_by_xpath(f'//*[text()="{text}"]').click()
 
 
 def create_new_invoice(driver, date, amount, contact_display_name):
     id = 'createButton'
-    WebDriverWait(driver, 10, poll_frequency=1).until(EC.presence_of_element_located((By.ID, id)))
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, id)))
     element = driver.find_element_by_id(id)
     while not (element.is_displayed() and element.is_enabled()):
         time.sleep(1)
     element.click()
     id = 'itemId'
-    WebDriverWait(driver, 10, poll_frequency=1).until(EC.presence_of_element_located((By.ID, id)))
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, id)))
     driver.find_element_by_id(id).send_keys('Dana\n')
     id = 'issueDate'
     element = driver.find_element_by_id(id)
@@ -59,28 +59,28 @@ def create_new_invoice(driver, date, amount, contact_display_name):
     element.clear()
     element.send_keys(f'{amount}\n')
     id = 'save'
-    WebDriverWait(driver, 10, poll_frequency=1).until(EC.presence_of_element_located((By.ID, id)))
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, id)))
     driver.find_element_by_id(id).click()
     return invoice_number
 
 
 #@util.wait_for_enter_before_execution
-@util.wait_before_execution(wait_s=1)
+@util.wait_before_execution(wait_s=4)
 def go_to_transactions_page(driver):
     text = 'Banking'
-    WebDriverWait(driver, 10, poll_frequency=1).until(EC.presence_of_element_located((By.XPATH, f"//*[text()='{text}']")))
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, f"//*[text()='{text}']")))
     driver.find_element_by_xpath(f'//*[text()="{text}"]').click()
     text = 'Bank transactions'
-    WebDriverWait(driver, 10, poll_frequency=1).until(EC.presence_of_element_located((By.XPATH, f"//*[text()='{text}']")))
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, f"//*[text()='{text}']")))
     driver.find_element_by_xpath(f'//*[text()="{text}"]').click()
 
 
 #@util.wait_for_enter_before_execution
-@util.wait_before_execution(wait_s=1)
+@util.wait_before_execution(wait_s=3)
 def match_transaction(driver, date_string: str, bank_account: str, other_match_string: str,
                       invoice_number: str):
     id = 'processed'
-    WebDriverWait(driver, 10, poll_frequency=1).until(EC.presence_of_element_located((By.ID, id)))
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, id)))
     select = Select(driver.find_element_by_id(id))
     select.select_by_visible_text('Unallocated transactions')
     id = 'from'
@@ -101,12 +101,12 @@ def match_transaction(driver, date_string: str, bank_account: str, other_match_s
     button.click()
     time.sleep(0.5)
     try:
-        checkbox = driver.find_element_by_xpath(f"//td[contains(text(), '{invoice_number}')]/preceding::input[@type='checkbox']")
+        checkbox = driver.find_element_by_xpath(f"//td[contains(text(), '{invoice_number}')]/preceding::input[@type='checkbox'][1]")
         checkbox.click()
     except NoSuchElementException:
         print('--> Cannot match - please match manually <--')
 
     id = 'saveButton'
-    WebDriverWait(driver, 10, poll_frequency=1).until(EC.presence_of_element_located((By.ID, id)))
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, id)))
     driver.find_element_by_id(id).click()
 
