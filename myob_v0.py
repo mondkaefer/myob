@@ -45,7 +45,6 @@ def _do_post(url: str, body: dict, dryrun: bool):
 def get_contacts():
     url = f'{api_base_url}/businesses/{config["myob_business_uid"]}/contacts?$top=1000&size=1000'
     content = json.loads(_do_get(url).content)
-    print(content['_links'])
     return content['items']
 
 
