@@ -10,7 +10,7 @@ from dateutil import parser
 import urllib.parse as urlparse
 from urllib.parse import parse_qs
 from selenium import webdriver
-import chromedriver_binary
+from selenium.webdriver.common.by import By
 
 
 def datetime_converter(o):
@@ -30,16 +30,16 @@ def authenticate():
                 f'response_type=code&' \
                 f'scope=la.global'
     driver.get(login_url)
-    element = driver.find_element_by_id("UserName")
+    element = driver.find_element(By.ID, "UserName")
     element.send_keys(config['myob_username'])
-    driver.find_element_by_xpath('//button[text()="Next "]').click()
-    element = driver.find_element_by_id("Password")
+    driver.find_element(By.XPATH, '//button[text()="Next "]').click()
+    element = driver.find_element(By.ID, "Password")
     element.send_keys(config['myob_password'])
-    driver.find_element_by_xpath('//button[text()="Sign in"]').click()
-    element = driver.find_element_by_id("Token")
+    driver.find_element(By.XPATH, '//button[text()="Sign in"]').click()
+    element = driver.find_element(By.ID, "Token")
     totp = pyotp.TOTP(config['myob_ga_secret'])
     element.send_keys(totp.now())
-    driver.find_element_by_xpath('//button[text()="Verify"]').click()
+    driver.find_element(By.XPATH, '//button[text()="Verify"]').click()
 
     # get code from redirect_url
     while True:
